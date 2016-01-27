@@ -1317,16 +1317,17 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
             video_thumbnail = compat_urllib_parse_unquote_plus(video_info['thumbnail_url'][0])
 
         # upload date
-        upload_date = self._html_search_meta(
-            'datePublished', video_webpage, 'upload date', default=None)
-        if not upload_date:
-            upload_date = self._search_regex(
-                [r'(?s)id="eow-date.*?>(.*?)</span>',
-                 r'id="watch-uploader-info".*?>.*?(?:Published|Uploaded|Streamed live|Started) on (.+?)</strong>'],
-                video_webpage, 'upload date', default=None)
-            if upload_date:
-                upload_date = ' '.join(re.sub(r'[/,-]', r' ', mobj.group(1)).split())
-        upload_date = unified_strdate(upload_date)
+        upload_date = ""
+        #upload_date = self._html_search_meta(
+        #    'datePublished', video_webpage, 'upload date', default=None)
+        #if not upload_date:
+        #    upload_date = self._search_regex(
+        #        [r'(?s)id="eow-date.*?>(.*?)</span>',
+        #         r'id="watch-uploader-info".*?>.*?(?:Published|Uploaded|Streamed live|Started) on (.+?)</strong>'],
+        #        video_webpage, 'upload date', default=None)
+        #    if upload_date:
+        #upload_date = ' '.join(re.sub(r'[/,-]', r' ', mobj.group(1)).split())
+        #upload_date = unified_strdate(upload_date)
 
         m_music = re.search(
             r'<h4[^>]+class="title"[^>]*>\s*Music\s*</h4>\s*<ul[^>]*>\s*<li>(?P<title>.+?) by (?P<creator>.+?)(?:\(.+?\))?</li',
