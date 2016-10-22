@@ -15,7 +15,7 @@ from .senateisvp import SenateISVPIE
 
 
 class CSpanIE(InfoExtractor):
-    _VALID_URL = r'http://(?:www\.)?c-span\.org/video/\?(?P<id>[0-9a-f]+)'
+    _VALID_URL = r'https?://(?:www\.)?c-span\.org/video/\?(?P<id>[0-9a-f]+)'
     IE_DESC = 'C-SPAN'
     _TESTS = [{
         'url': 'http://www.c-span.org/video/?313572-1/HolderonV',
@@ -51,8 +51,11 @@ class CSpanIE(InfoExtractor):
         'url': 'http://www.c-span.org/video/?104517-1/immigration-reforms-needed-protect-skilled-american-workers',
         'info_dict': {
             'id': 'judiciary031715',
-            'ext': 'flv',
+            'ext': 'mp4',
             'title': 'Immigration Reforms Needed to Protect Skilled American Workers',
+        },
+        'params': {
+            'skip_download': True,  # m3u8 downloads
         }
     }]
 
@@ -113,7 +116,7 @@ class CSpanIE(InfoExtractor):
                     'tbr': int_or_none(get_text_attr(quality, 'bitrate')),
                 })
             if not formats:
-                path = get_text_attr(f, 'path')
+                path = unescapeHTML(get_text_attr(f, 'path'))
                 if not path:
                     continue
                 formats = self._extract_m3u8_formats(

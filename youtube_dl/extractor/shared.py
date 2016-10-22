@@ -3,17 +3,16 @@ from __future__ import unicode_literals
 import base64
 
 from .common import InfoExtractor
-from ..compat import compat_urllib_parse
 from ..utils import (
     ExtractorError,
     int_or_none,
-    sanitized_Request,
+    urlencode_postdata,
 )
 
 
 class SharedIE(InfoExtractor):
     IE_DESC = 'shared.sx and vivo.sx'
-    _VALID_URL = r'http://(?:shared|vivo)\.sx/(?P<id>[\da-z]{10})'
+    _VALID_URL = r'https?://(?:shared|vivo)\.sx/(?P<id>[\da-z]{10})'
 
     _TESTS = [{
         'url': 'http://shared.sx/0060718775',
@@ -37,28 +36,33 @@ class SharedIE(InfoExtractor):
 
     def _real_extract(self, url):
         video_id = self._match_id(url)
-        webpage = self._download_webpage(url, video_id)
+
+        webpage, urlh = self._download_webpage_handle(url, video_id)
 
         if '>File does not exist<' in webpage:
             raise ExtractorError(
                 'Video %s does not exist' % video_id, expected=True)
 
         download_form = self._hidden_inputs(webpage)
-        request = sanitized_Request(
-            url, compat_urllib_parse.urlencode(download_form))
-        request.add_header('Content-Type', 'application/x-www-form-urlencoded')
 
         video_page = self._download_webpage(
-            request, video_id, 'Downloading video page')
+            urlh.geturl(), video_id, 'Downloading video page',
+            data=urlencode_postdata(download_form),
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Referer': urlh.geturl(),
+            })
 
         video_url = self._html_search_regex(
-            r'data-url="([^"]+)"', video_page, 'video URL')
+            r'data-url=(["\'])(?P<url>(?:(?!\1).)+)\1',
+            video_page, 'video URL', group='url')
         title = base64.b64decode(self._html_search_meta(
             'full:title', webpage, 'title').encode('utf-8')).decode('utf-8')
         filesize = int_or_none(self._html_search_meta(
             'full:size', webpage, 'file size', fatal=False))
         thumbnail = self._html_search_regex(
-            r'data-poster="([^"]+)"', video_page, 'thumbnail', default=None)
+            r'data-poster=(["\'])(?P<url>(?:(?!\1).)+)\1',
+            video_page, 'thumbnail', default=None, group='url')
 
         return {
             'id': video_id,

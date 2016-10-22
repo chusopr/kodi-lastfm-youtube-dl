@@ -17,7 +17,8 @@ class ChaturbateIE(InfoExtractor):
         },
         'params': {
             'skip_download': True,
-        }
+        },
+        'skip': 'Room is offline',
     }, {
         'url': 'https://en.chaturbate.com/siswet19/',
         'only_matching': True,
@@ -48,6 +49,7 @@ class ChaturbateIE(InfoExtractor):
             raise ExtractorError('Unable to find stream URL')
 
         formats = self._extract_m3u8_formats(m3u8_url, video_id, ext='mp4')
+        self._sort_formats(formats)
 
         return {
             'id': video_id,
