@@ -2,11 +2,7 @@ from __future__ import unicode_literals
 
 import re
 import binascii
-try:
-    from Crypto.Cipher import AES
-    can_decrypt_frag = True
-except ImportError:
-    can_decrypt_frag = False
+can_decrypt_frag = False
 
 from .fragment import FragmentFD
 from .external import FFmpegFD
